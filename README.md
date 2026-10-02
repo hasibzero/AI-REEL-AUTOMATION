@@ -1,104 +1,150 @@
+<div align="center">
+
 # AI Reel — Shorts Studio
 
-Automated short-form video pipeline. Give it a niche and a topic; it produces
-platform-ready vertical shorts (1080×1920) with AI images, voiceover, burned-in
-captions, music and transitions, then optionally publishes them.
+### Turn an idea into a publish-ready short
 
-Runs natively on Windows. No Docker, no WSL, no Redis — SQLite is the queue.
+An automated, Windows-native pipeline for generating vertical videos with AI
+scripts, images, voiceover, captions, music, transitions, and publishing.
+
+<a href="mailto:hasibsarkar98@gmail.com"><img src="https://img.shields.io/badge/Email-Contact%20me-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Contact by email"></a>
+<a href="https://t.me/zero0000101"><img src="https://img.shields.io/badge/Telegram-Message%20me-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Message on Telegram"></a>
+
+<br>
+
+<details>
+<summary><strong>Need a ready-made automation? Show contact QR code</strong></summary>
+
+<br>
+
+<a href="https://t.me/zero0000101">
+  <img src="contact-telegram.png" width="220" alt="Scan to message me on Telegram">
+</a>
+
+<br>
+
+Scan to discuss a private setup, customization, or ready-to-use deployment.
+</details>
+
+<br>
 
 ![Pipeline dashboard](screenshots/dashboard.png)
 
----
+</div>
+
+## Overview
+
+AI Reel is a complete short-form content pipeline. Give it a niche and a topic;
+it turns that idea into platform-ready video output at 1080x1920, with optional
+publishing to connected channels.
+
+It runs natively on Windows with SQLite as the queue. No Docker, WSL, Redis, or
+external queue broker is required.
 
 ## What it does
 
-1. **Script** — an LLM writes a hook, scene breakdown and captions for your topic
-2. **Images** — ComfyUI generates one 9:16 still per scene
-3. **Voiceover** — Kokoro TTS, then Whisper aligns word timestamps
-4. **Render** — FFmpeg applies Ken Burns motion, captions, music and xfades
-5. **Publish** — optional, pushes to connected TikTok / YouTube / Meta channels
+| Stage | What happens |
+|---|---|
+| **Script** | An LLM writes the hook, scene breakdown, narration, and captions |
+| **Images** | ComfyUI generates one visual per scene and output shape |
+| **Voiceover** | Kokoro creates speech and Whisper aligns word timestamps |
+| **Render** | FFmpeg adds motion, captions, music, transitions, and formatting |
+| **Publish** | Optional upload to connected TikTok, YouTube, Instagram, and Meta channels |
+
+Jobs move through a predictable pipeline:
+
+`pending` -> `awaiting_approval` -> `scripted` -> `generating_images` ->
+`generating_tts` -> `rendering` -> `done`
+
+Failed jobs are marked `failed` and can be investigated from the dashboard.
+
+## Highlights
+
+- Responsive React dashboard for the full content workflow
+- Niche-aware style bibles for consistent visual identity
+- Four-link LLM fallback chain with health tracking
+- ComfyUI image generation with quality profiles
+- Kokoro TTS with Whisper word-level alignment
+- FFmpeg rendering with Ken Burns motion, captions, music, and xfades
+- SQLite queue and storage with no broker dependency
+- Optional OAuth publishing integrations
+- Local Windows services and PowerShell startup scripts
 
 ## Architecture
 
-```
-┌────────────────┐   POST /api/topics   ┌────────────────┐
-│  React + Vite  │ ───────────────────► │  FastAPI :8000 │
-│     :3000      │                      └───────┬────────┘
-└────────────────┘                              │ INSERT topic + job
-                                                ▼
-                                     ┌──────────────────┐
-                                     │  SQLite job_queue│
-                                     └────────┬─────────┘
-                                              │ poll every 2s
-                                              ▼
-                                    ┌─────────────────────┐
-                                    │  Worker  (pythonw)  │
-                                    └──────────┬──────────┘
-         ┌───────────────┬──────────────┬──────┴───────┬──────────────┐
-         ▼               ▼              ▼              ▼              ▼
-   ┌───────────┐   ┌──────────┐   ┌────────┐    ┌─────────┐   ┌──────────┐
-   │  Script   │   │  Images  │   │  TTS   │    │ Render  │   │ Publish  │
-   │ LLM chain │   │ ComfyUI  │   │ Kokoro │    │ FFmpeg  │   │ OAuth    │
-   │           │   │  :8188   │   │ Whisper│    │         │   │  APIs    │
-   └───────────┘   └──────────┘   └────────┘    └─────────┘   └──────────┘
+```text
+React + Vite :3000
+        |
+        | POST /api/topics
+        v
+FastAPI :8000 ----> SQLite job_queue
+                          |
+                          v
+                    Pipeline worker
+          ____________|_____|____________
+         |            |     |            |
+       Script       Images  TTS        Render
+        LLM        ComfyUI Kokoro     FFmpeg
+                                      |
+                                      v
+                                  Publish
 ```
 
-Status moves linearly: `pending → awaiting_approval → scripted →
-generating_images → generating_tts → rendering → done` (or `failed`).
+## Technology stack
 
-## Stack
+| Area | Technology |
+|---|---|
+| Web UI | React 18, Vite, Tailwind |
+| API | FastAPI, Uvicorn |
+| Queue and storage | SQLite |
+| Script generation | Kilo gateway, Gemini, Groq, Ollama |
+| Image generation | ComfyUI, Qwen-Image GGUF |
+| Voice and alignment | Kokoro v0.19 ONNX, Whisper |
+| Video | FFmpeg, NVENC when available |
+| Publishing | OAuth integrations for supported platforms |
 
-| Piece | Technology | Notes |
-|---|---|---|
-| Web UI | React 18 + Vite + Tailwind | 9 pages, responsive |
-| API | FastAPI + Uvicorn | ~60 REST endpoints |
-| Queue | SQLite `job_queue` table | 2s poll, no broker |
-| Script generation | 4-link LLM chain | Kilo gateway → Gemini → Groq → Ollama |
-| Image generation | ComfyUI + Qwen-Image GGUF | Must load a real model |
-| TTS | Kokoro v0.19 ONNX | Word-aligned via Whisper |
-| Video | FFmpeg (NVENC when available) | zoompan, xfade, ASS subs |
-| Storage | SQLite | 13 tables |
+## LLM fallback chain
 
-## The LLM chain
+`src/llm/client.py` tries configured providers in order and falls through when a
+provider is unavailable:
 
-`src/llm/client.py` tries four links in order and falls through on failure:
+1. **Kilo gateway** — free gateway when configured
+2. **Gemini** — metered against a daily quota
+3. **Groq** — rolls through the configured model list on rate limits
+4. **Ollama** — local offline fallback
 
-1. **Kilo gateway** (`kilo:` prefix) — free, tried first when configured
-2. **Gemini** — `gemini-3.8-flash`, metered against a daily quota
-3. **Groq** — comma-separated model list rolls over on rate limit
-4. **Ollama** — `llama3.1:8b` local, the offline floor
+Provider health is persisted so a failed provider can be skipped temporarily
+instead of delaying every new topic. A per-topic model pin can override the
+default order.
 
-A link that fails twice is skipped for 30 minutes, and that health state is
-persisted to the `kv_settings` table so a restart does not re-pay for a link
-that was already timing out. A per-topic model pin overrides the chain order.
-
-## Platforms and output shapes
+## Output formats
 
 | Platform | Size | Ratio |
-|---|---|---|
-| TikTok | 1080×1920 | 9:16 |
-| YouTube Shorts | 1080×1920 | 9:16 |
-| Instagram Reels | 1080×1920 | 9:16 |
-| Facebook Reels | 1080×1920 | 9:16 |
-| Instagram feed | 1080×1350 | 4:5 |
-| Instagram square | 1080×1080 | 1:1 |
+|---|---:|---:|
+| TikTok | 1080x1920 | 9:16 |
+| YouTube Shorts | 1080x1920 | 9:16 |
+| Instagram Reels | 1080x1920 | 9:16 |
+| Facebook Reels | 1080x1920 | 9:16 |
+| Instagram feed | 1080x1350 | 4:5 |
+| Instagram square | 1080x1080 | 1:1 |
 
-Images are generated **per shape**, not per topic. A topic requesting both a
-reel and a square produces one 9:16 pass and one 1:1 pass; the Ken Burns frame
-follows the platform so a square is not a cropped vertical.
+Images are generated per output shape, so square content is not simply cropped
+from a vertical composition.
 
 ## Style bibles
 
-Each niche has a YAML file in `style_bibles/` defining palette, materials,
-lighting, composition, camera, typography, per-scene transitions, music style
-and SFX. Edit in the UI under Style Bibles or edit the YAML directly.
+Each niche has a YAML style bible defining palette, materials, lighting,
+composition, camera, typography, transitions, music, and sound effects.
 
-Bundled: `science`, `love`, `health`, `quotes`, `personal_finance`,
-`legal_drama`.
+Bundled niches:
 
-## Running it
+`science` · `love` · `health` · `quotes` · `personal_finance` · `legal_drama`
 
-Double-click **`Start-AI-Reel.bat`**, or from PowerShell:
+Style bibles can be edited from the UI or directly in `style_bibles/`.
+
+## Getting started
+
+Start the local services from PowerShell:
 
 ```powershell
 .\ai-reel.ps1 -Action start
@@ -107,156 +153,129 @@ Double-click **`Start-AI-Reel.bat`**, or from PowerShell:
 .\ai-reel.ps1 -Action stop
 ```
 
-Batch defaults for a whole session can be set at launch:
-
-```powershell
-.\Start-AI-Reel.bat -Model groq:openai/gpt-oss-120b -Quality high_detail -Caption sentence
-```
+Or double-click `Start-AI-Reel.bat`.
 
 | Service | URL |
 |---|---|
 | Web UI | http://localhost:3000 |
 | API docs | http://localhost:8000/docs |
 | ComfyUI | http://localhost:8188 |
-| Ollama | http://localhost:11434 (started separately) |
+| Ollama | http://localhost:11434 |
 
-Ollama is deliberately not managed by the starter — start it yourself when you
-want local models.
+Ollama is started separately when local models are needed.
 
 ## Configuration
 
-Copy `.env.example` to `.env` and fill it in.
+Copy `.env.example` to `.env` and configure the providers and local services
+you plan to use.
 
 | Variable | Purpose |
 |---|---|
-| `GEMINI_API_KEY` | Required for the Gemini link |
-| `KILO_API_KEY` / `KILO_MODEL` | Free gateway, tried first |
-| `GROQ_API_KEY` / `GROQ_MODEL` | Rate-limit rollover list |
-| `COMFYUI_URL` | Point at your ComfyUI install |
-| `DB_PATH` | SQLite location |
-| `OUTPUT_DIR` | Where rendered videos land |
+| `GEMINI_API_KEY` | Gemini access |
+| `KILO_API_KEY` / `KILO_MODEL` | Kilo gateway access and model |
+| `GROQ_API_KEY` / `GROQ_MODEL` | Groq access and rollover models |
+| `COMFYUI_URL` | ComfyUI service URL |
+| `DB_PATH` | SQLite database location |
+| `OUTPUT_DIR` | Rendered video location |
 | `FFMPEG_DIR` | FFmpeg `bin` folder |
-| `*_CLIENT_ID` / `*_CLIENT_SECRET` | OAuth apps for publishing |
+| `*_CLIENT_ID` / `*_CLIENT_SECRET` | Publishing OAuth applications |
 
-Token usage is tracked per topic and daily-aggregated in `cost_tracking`, with
-a daily request ceiling enforced before Gemini is called.
+Keep `.env` and all API credentials private. Token usage is tracked per topic
+and aggregated in `cost_tracking`, with a daily request ceiling before Gemini
+is called.
 
-## Layout
+## Project layout
 
-```
+```text
 ai-reel/
 ├── src/
-│   ├── llm/           4-link chain, prompts, model picker
-│   ├── image_gen/     ComfyUI client + quality profiles
-│   ├── tts/           Kokoro synthesis, Whisper alignment
+│   ├── llm/           LLM chain, prompts, model picker
+│   ├── image_gen/     ComfyUI client and quality profiles
+│   ├── tts/           Kokoro synthesis and Whisper alignment
 │   ├── video/         FFmpeg filtergraph builder
-│   ├── publish/       OAuth + per-platform upload
-│   ├── queue/         Worker, job chain, retry/resilience
-│   ├── db/            SQLite repository + schema
+│   ├── publish/       OAuth and platform uploads
+│   ├── queue/         Worker, job chain, retry logic
+│   ├── db/            SQLite repository and schema
 │   └── style_bible/   YAML loader
 ├── web_ui/
-│   ├── backend/app/   FastAPI (main.py, routers, models)
-│   └── frontend/src/  React pages + components
-├── style_bibles/      Per-niche YAML
+│   ├── backend/app/   FastAPI app, routers, and models
+│   └── frontend/src/  React pages and components
+├── style_bibles/      Per-niche YAML files
 ├── tests/             Standalone test scripts
-├── data/topics.db     SQLite database
-├── output/            Rendered videos, per topic ID
+├── data/              SQLite data
+├── output/            Rendered videos by topic
 ├── models/ fonts/ music/
-└── ai-reel.ps1        start/stop/status/logs
+└── ai-reel.ps1        Start, stop, status, and logs
 ```
 
-## Tests
+## Testing
 
-Each script runs standalone through the venv:
+Run focused test scripts through the project virtual environment:
 
 ```powershell
 venv\Scripts\python.exe -u tests\test_render_speed.py
 venv\Scripts\python.exe -u tests\test_output_shapes.py
 ```
 
-Running the whole `tests\*.py` set spawns a console window per file and runs
-ffmpeg renders, so it is slow and noisy — run scripts individually unless you
-want the full sweep.
+Run scripts individually for faster feedback; the complete test set can invoke
+multiple FFmpeg renders.
 
 ## Troubleshooting
 
-**ComfyUI is up but every image fails** — the server loaded no models. The
-launcher checks `object_info` for the Qwen weights, but if you started ComfyUI
-by hand, confirm the checkpoint is in its `models/checkpoints/`.
+**ComfyUI is available but image generation fails** — verify that the required
+Qwen model is installed in `models/checkpoints/` and that ComfyUI is using its
+own project environment.
 
-**Script generation times out** — the chain reaches the local model. Set a
-`GROQ_API_KEY` or `KILO_API_KEY` so it has a fast paid/free link ahead of Ollama.
+**Script generation times out** — configure `GROQ_API_KEY` or `KILO_API_KEY` so
+a fast remote provider is available before the Ollama fallback.
 
-**Topic stuck in `waiting`** — the stage's service is down. The worker parks the
-job and retries every 20s rather than failing it; bring the service up and it
-resumes on its own.
+**A topic is stuck waiting** — check the service for its current pipeline stage.
+The worker retries unavailable stages instead of immediately discarding the job.
 
-**Out of GPU memory** — ComfyUI runs with `--lowvram --vram-headroom 2`.
-
-## Need a ready-made automation?
-
-> # 🚀 Want this automation ready-made for your workflow?
->
-> I can configure and deliver a ready-to-use private automation setup. Send
-> your requirements and preferred platforms, and I’ll get back to you directly.
->
-> <a href="mailto:hasibsarkar98@gmail.com"><img src="https://img.shields.io/badge/Email-Contact%20me-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Contact by email"></a>
-> <a href="https://t.me/zero0000101"><img src="https://img.shields.io/badge/Telegram-Message%20me-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Message on Telegram"></a>
-
-<details>
-<summary>Show Telegram QR code</summary>
-
-<p align="center">
-  <a href="https://t.me/zero0000101">
-    <img src="contact-telegram.png" width="220" alt="Scan to message me on Telegram">
-  </a>
-</p>
-</details>
+**GPU memory is exhausted** — run ComfyUI with `--lowvram --vram-headroom 2`.
 
 ## Screenshots
 
-The studio is designed to make the full short-form workflow visible in one
-place, from discovering ideas to publishing finished videos.
+### Topics and ideas
 
-### Pipeline dashboard
+Browse topic history, filter by niche and upload state, and queue new content
+from AI-generated ideas.
 
-Monitor dependencies, LLM quotas, runtime processes, queue health, pipeline
-stages, and recent activity from one live control center.
+<p align="center">
+  <img src="screenshots/topics.png" alt="Topics page">
+  <img src="screenshots/ideas.png" alt="Topic ideas page">
+</p>
 
-![Pipeline dashboard](screenshots/dashboard.png)
+### Visual configuration
 
-### Create and manage content
+Edit style bibles and manage the pipeline's environment-backed settings.
 
-Browse queued and completed topics, filter by niche or upload state, and start
-new jobs without leaving the studio.
+<p align="center">
+  <img src="screenshots/style-bibles.png" alt="Style bibles page">
+  <img src="screenshots/settings.png" alt="Settings page">
+</p>
 
-![Topics](screenshots/topics.png)
+### Results and performance
 
-Generate niche-specific ideas with one click, then queue the angles that are
-ready to become videos.
+Review published videos and monitor throughput, token usage, platform
+distribution, and estimated cost.
 
-![Topic ideas](screenshots/ideas.png)
+<p align="center">
+  <img src="screenshots/downloads.png" alt="Downloads page">
+  <img src="screenshots/analytics.png" alt="Analytics page">
+</p>
 
-### Configure the visual system
+## Private project
 
-Edit each niche's style bible directly in the UI, including palette,
-composition, lighting, and other visual rules used during generation.
+This repository is maintained as a private project. Please do not publish
+credentials, generated media, private customer data, or local environment files.
 
-![Style bibles](screenshots/style-bibles.png)
+## Need a ready-made automation?
 
-Configure services, environment-backed settings, schedules, and niche
-management from the settings page.
+For private setup, customization, or a ready-to-use deployment, use the contact
+buttons at the top of this page:
 
-![Settings](screenshots/settings.png)
-
-### Review results and performance
-
-Review finished videos, download outputs, and see which channels have already
-received each render.
-
-![Downloads](screenshots/downloads.png)
-
-Track topic volume, token usage, platform distribution, and estimated cost
-over time.
-
-![Analytics](screenshots/analytics.png)
+<div align="center">
+<a href="mailto:hasibsarkar98@gmail.com"><img src="https://img.shields.io/badge/Email-Contact%20me-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Contact by email"></a>
+<a href="https://t.me/zero0000101"><img src="https://img.shields.io/badge/Telegram-Message%20me-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Message on Telegram"></a>
+</div>
