@@ -9,6 +9,7 @@ scripts, images, voiceover, captions, music, transitions, and publishing.
 
 <a href="mailto:hasibsarkar98@gmail.com"><img src="https://img.shields.io/badge/Email-Contact%20me-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Contact by email"></a>
 <a href="https://t.me/zero0000101"><img src="https://img.shields.io/badge/Telegram-Message%20me-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Message on Telegram"></a>
+<a href="https://www.facebook.com/ddo.philosophy"><img src="https://img.shields.io/badge/Facebook-View%20output%20examples-1877F2?style=for-the-badge&logo=facebook&logoColor=white" alt="View output examples on Facebook"></a>
 
 <br>
 
@@ -40,6 +41,16 @@ publishing to connected channels.
 
 It runs natively on Windows with SQLite as the queue. No Docker, WSL, Redis, or
 external queue broker is required.
+
+## Output examples
+
+See finished AI Reel videos and short-form output examples on the Facebook page:
+
+<div align="center">
+  <a href="https://www.facebook.com/ddo.philosophy">
+    <img src="https://img.shields.io/badge/View%20output%20examples%20on%20Facebook-1877F2?style=for-the-badge&logo=facebook&logoColor=white" alt="View output examples on Facebook">
+  </a>
+</div>
 
 ## What it does
 
