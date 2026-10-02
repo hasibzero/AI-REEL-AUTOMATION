@@ -200,12 +200,18 @@ resumes on its own.
 > I can configure and deliver a ready-to-use private automation setup. Send
 > your requirements and preferred platforms, and I’ll get back to you directly.
 >
-> **Email:** [hasibsarkar98@gmail.com](mailto:hasibsarkar98@gmail.com)  
-> **Telegram:** [@zero0000101](https://t.me/zero0000101)
->
-> **Scan to message me on Telegram:**
->
-> [![Contact me on Telegram](contact-telegram.png)](https://t.me/zero0000101)
+> <a href="mailto:hasibsarkar98@gmail.com"><img src="https://img.shields.io/badge/Email-Contact%20me-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Contact by email"></a>
+> <a href="https://t.me/zero0000101"><img src="https://img.shields.io/badge/Telegram-Message%20me-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Message on Telegram"></a>
+
+<details>
+<summary>Show Telegram QR code</summary>
+
+<p align="center">
+  <a href="https://t.me/zero0000101">
+    <img src="contact-telegram.png" width="220" alt="Scan to message me on Telegram">
+  </a>
+</p>
+</details>
 
 ## Screenshots
 
