@@ -53,7 +53,6 @@ generating_images → generating_tts → rendering → done` (or `failed`).
 | Web UI | React 18 + Vite + Tailwind | 9 pages, responsive |
 | API | FastAPI + Uvicorn | ~60 REST endpoints |
 | Queue | SQLite `job_queue` table | 2s poll, no broker |
-| Process supervision | PM2 (`ecosystem.config.js`) | 4 apps, hidden windows |
 | Script generation | 4-link LLM chain | Kilo gateway → Gemini → Groq → Ollama |
 | Image generation | ComfyUI + Qwen-Image GGUF | Must load a real model |
 | TTS | Kokoro v0.19 ONNX | Word-aligned via Whisper |
@@ -142,20 +141,6 @@ Copy `.env.example` to `.env` and fill it in.
 Token usage is tracked per topic and daily-aggregated in `cost_tracking`, with
 a daily request ceiling enforced before Gemini is called.
 
-## PM2 services
-
-`ecosystem.config.js` supervises four apps: `comfyui`, `worker`, `api`,
-`frontend`.
-
-Two settings exist to stop console windows flashing on every restart:
-`windowsHide: true`, and `pythonw.exe` instead of `python.exe` for the worker and
-API. The ComfyUI entry must use **its own venv interpreter** — running it under a
-different Python yields a server that answers `/system_stats` happily while
-rejecting every graph with `unet_name not in []`.
-
-Restarts are capped (`max_restarts: 3`, `restart_delay: 5000`) so a service that
-can never start produces one visible failure instead of an endless flash loop.
-
 ## Layout
 
 ```
@@ -177,7 +162,6 @@ ai-reel/
 ├── data/topics.db     SQLite database
 ├── output/            Rendered videos, per topic ID
 ├── models/ fonts/ music/
-├── ecosystem.config.js
 └── ai-reel.ps1        start/stop/status/logs
 ```
 
@@ -196,10 +180,6 @@ want the full sweep.
 
 ## Troubleshooting
 
-**Console window flashes repeatedly** — PM2 is restarting a service that cannot
-start. `pm2 list` shows the status and restart count; `.\ai-reel.ps1 -Action logs`
-shows why. Usually a wrong path or a missing binary.
-
 **ComfyUI is up but every image fails** — the server loaded no models. The
 launcher checks `object_info` for the Qwen weights, but if you started ComfyUI
 by hand, confirm the checkpoint is in its `models/checkpoints/`.
@@ -212,6 +192,20 @@ job and retries every 20s rather than failing it; bring the service up and it
 resumes on its own.
 
 **Out of GPU memory** — ComfyUI runs with `--lowvram --vram-headroom 2`.
+
+## Need a ready-made automation?
+
+> # 🚀 Want this automation ready-made for your workflow?
+>
+> I can configure and deliver a ready-to-use private automation setup. Send
+> your requirements and preferred platforms, and I’ll get back to you directly.
+>
+> **Email:** [hasibsarkar98@gmail.com](mailto:hasibsarkar98@gmail.com)  
+> **Telegram:** [@zero0000101](https://t.me/zero0000101)
+>
+> **Scan to message me on Telegram:**
+>
+> [![Contact me on Telegram](contact-telegram.png)](https://t.me/zero0000101)
 
 ## Screenshots
 
