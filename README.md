@@ -1,11 +1,14 @@
 <div align="center">
 
-# AI Reel — Shorts Studio
+# AI Reel — AI Video Generator & Short-Form Content Automation
 
-### Turn an idea into a publish-ready short
+### Turn an idea into a publish-ready short video
 
-An automated, Windows-native pipeline for generating vertical videos with AI
-scripts, images, voiceover, captions, music, transitions, and publishing.
+AI Reel is a Windows-native **AI video generator**, **faceless video
+automation**, and **social media content automation** pipeline for creating
+TikTok videos, YouTube Shorts, Instagram Reels, and Facebook Reels. Generate
+scripts, AI images, voiceovers, captions, music, transitions, and platform-ready
+vertical videos from one topic.
 
 <a href="mailto:hasibsarkar98@gmail.com"><img src="https://img.shields.io/badge/Email-Contact%20me-EA4335?style=for-the-badge&logo=gmail&logoColor=white" alt="Contact by email"></a>
 <a href="https://t.me/zero0000101"><img src="https://img.shields.io/badge/Telegram-Message%20me-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Message on Telegram"></a>
@@ -33,14 +36,52 @@ Scan to discuss a private setup, customization, or ready-to-use deployment.
 
 </div>
 
+## Table of contents
+
+- [Overview](#overview)
+- [Who this is for](#who-this-is-for)
+- [Output examples](#output-examples)
+- [What it does](#what-it-does)
+- [Why use this workflow?](#why-use-this-workflow)
+- [Highlights](#highlights)
+- [Architecture](#architecture)
+- [Technology stack](#technology-stack)
+- [LLM fallback chain](#llm-fallback-chain)
+- [Output formats](#output-formats)
+- [Style bibles](#style-bibles)
+- [Getting started](#getting-started)
+- [Configuration](#configuration)
+- [Project layout](#project-layout)
+- [Testing](#testing)
+- [Troubleshooting](#troubleshooting)
+- [Screenshots](#screenshots)
+- [Private project](#private-project)
+- [Need a ready-made automation?](#need-a-ready-made-automation)
+
 ## Overview
 
-AI Reel is a complete short-form content pipeline. Give it a niche and a topic;
-it turns that idea into platform-ready video output at 1080x1920, with optional
-publishing to connected channels.
+AI Reel is an end-to-end **short-form video automation** system. Give it a
+niche and a topic; it creates a complete vertical video at 1080x1920 with AI
+scriptwriting, image generation, text-to-speech, automatic captions, video
+rendering, and optional social media publishing.
 
 It runs natively on Windows with SQLite as the queue. No Docker, WSL, Redis, or
 external queue broker is required.
+
+### Related use cases
+
+This project is useful for AI video generation, faceless YouTube channel
+workflows, YouTube Shorts automation, TikTok automation, Instagram Reels
+automation, Facebook Reels automation, text-to-video production, and
+self-hosted social media content automation.
+
+## Who this is for
+
+- Creators building faceless YouTube Shorts, TikTok, or Instagram Reels channels
+- Agencies producing repeatable short-form content for multiple niches
+- Businesses turning educational, promotional, or product ideas into videos
+- Developers who want a self-hosted AI video generation workflow on Windows
+- Teams that need a local queue, processing dashboard, and publishing pipeline
 
 ## Output examples
 
@@ -68,6 +109,13 @@ Jobs move through a predictable pipeline:
 `generating_tts` -> `rendering` -> `done`
 
 Failed jobs are marked `failed` and can be investigated from the dashboard.
+
+## Why use this workflow?
+
+Instead of stitching together separate AI writing, image, voice, caption, and
+editing tools for every video, AI Reel coordinates those stages as one
+repeatable pipeline. Topics, provider health, job progress, output formats,
+costs, and failures are visible from the same dashboard.
 
 ## Highlights
 
