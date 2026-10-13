@@ -319,6 +319,8 @@ Edit style bibles and manage the pipeline's environment-backed settings.
 Review published videos and monitor throughput, token usage, platform
 distribution, and estimated cost.
 
+<iframe width="1038" height="625" src="https://www.youtube.com/embed/5jL7ww5hCLo" title="AI REEL AUTOMATION SHOWCASE" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+
 <p align="center">
   <img src="screenshots/downloads.png" alt="Downloads page">
   <img src="screenshots/analytics.png" alt="Analytics page">
