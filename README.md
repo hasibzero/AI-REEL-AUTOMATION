@@ -319,9 +319,6 @@ Edit style bibles and manage the pipeline's environment-backed settings.
 Review published videos and monitor throughput, token usage, platform
 distribution, and estimated cost.
 
-<p align="center">
-  <video src="https://www.youtube.com/embed/5jL7ww5hCLo" width="100%" controls></video>
-</p>
 
 
 <p align="center">
